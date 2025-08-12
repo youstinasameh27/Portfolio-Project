@@ -1,0 +1,15 @@
+<h2>{{isEdit?'Edit':'Add'}} Topic</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="card form">
+  <label>Section</label>
+  <select formControlName="section">
+    <option value="introduction">Introduction</option>
+    <option value="backend">Backend</option>
+    <option value="frontend">Frontend</option>
+  </select>
+  <label>Name</label>
+  <input type="text" formControlName="name">
+  <div *ngIf="form.controls['name'].invalid && (form.controls['name'].dirty || form.controls['name'].touched)" class="text-danger">Name min 3.</div>
+  <label>Grade</label>
+  <input type="number" formControlName="grade">
+  <button class="btn" type="submit">{{isEdit?'Update':'Create'}}</button>
+</form>

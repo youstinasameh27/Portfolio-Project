@@ -1,0 +1,32 @@
+import { Routes } from '@angular/router';
+import { Home } from './home/home';
+import { About } from './about/about';
+import { Contact } from './contact/contact';
+import { Dashboard } from './dashboard/dashboard';
+import { Admin } from './admin/admin';
+import { ProjectList } from './project-list/project-list';
+import { ProjectDetail } from './project-detail/project-detail';
+import { ProjectForm } from './project-form/project-form';
+import { SkillList } from './skill-list/skill-list';
+import { SkillForm } from './skill-form/skill-form';
+import { TopicList } from './topic-list/topic-list';
+import { TopicForm } from './topic-form/topic-form';
+
+export const routes: Routes = [
+  { path: '', component: Home },
+  { path: 'about', component: About },
+  { path: 'contact', component: Contact },
+  { path: 'dashboard', component: Dashboard },
+  { path: 'admin', component: Admin },
+  { path: 'projects', component: ProjectList },
+  { path: 'projects/new', component: ProjectForm },
+  { path: 'projects/:id', component: ProjectDetail },
+  { path: 'projects/:id/edit', component: ProjectForm },
+  { path: 'skills', component: SkillList },
+  { path: 'skills/new', component: SkillForm },
+  { path: 'skills/:id/edit', component: SkillForm },
+  { path: 'topics', component: TopicList },
+  { path: 'topics/new', component: TopicForm },
+  { path: 'topics/:id/edit', component: TopicForm },
+  { path: '**', redirectTo: '' }
+];

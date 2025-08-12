@@ -1,0 +1,175 @@
+/* === Dashboard root === */
+:host {
+  display: block;
+  color: #eef0ff; /* strong default text on dark bg */
+}
+
+/* === Top counters === */
+.stats {
+  gap: 16px;
+}
+
+.stat {
+  display: grid;
+  place-items: center;
+  padding: 18px 16px;
+  border-radius: 14px;
+}
+
+.stat .n {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat .t {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* === Grid fallback (if no global .grid) === */
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* === Cards (higher contrast + force full opacity only on Dashboard) === */
+.card {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #eef0ff;
+  opacity: 1 !important; /* override any global opacity */
+}
+
+/* Headings inside cards */
+.card h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #f3e9ff !important;
+}
+
+/* Lists inside cards */
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.text-muted {
+  opacity: 0.7;
+}
+
+/* === Skill sliders (like your reference image) === */
+.skill-slider-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 110px;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.skill-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #f3e9ff !important;
+}
+
+.level-label {
+  text-align: right;
+  opacity: 1;
+  color: #f3e9ff !important;
+}
+
+/* wrap to hold track + labels */
+.level-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* track */
+.level-track {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18); /* brighter so the fill pops */
+  overflow: hidden;
+}
+
+/* gradient fill (pink -> violet to match theme) */
+.level-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #e65bff 0%, #a855f7 100%);
+}
+
+/* circular knob */
+.level-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffb3ff 40%, #e65bff 70%);
+  box-shadow: 0 0 0 5px rgba(230, 91, 255, 0.30), 0 2px 10px rgba(0, 0, 0, .35);
+}
+
+/* tick marks (0%, 33%, 66%, 100%) */
+.level-track .tick {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%);
+}
+.level-track .t0 { left: 0%; }
+.level-track .t1 { left: 33.333%; }
+.level-track .t2 { left: 66.666%; }
+.level-track .t3 { left: 100%; }
+
+/* labelled scale under the track */
+.tick-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #dcd7ff !important;
+  opacity: 1;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+}
+.tick-labels span {
+  text-align: center;
+}
+
+/* === Recent lists === */
+.card ul li {
+  padding: 4px 0;
+}
+
+/* === Responsive tweaks === */
+@media (max-width: 800px) {
+  .skill-slider-row {
+    grid-template-columns: 120px 1fr 80px;
+    gap: 10px;
+  }
+  .stat .n { font-size: 24px; }
+}
+
+@media (max-width: 520px) {
+  .skill-slider-row {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: 8px;
+  }
+  .level-label { text-align: left; }
+}

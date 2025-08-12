@@ -1,0 +1,23 @@
+<header class="hdr">
+  <div class="brand">
+    <span class="dot"></span>
+    <a routerLink="/">Youstina<span>Fahim</span></a>
+  </div>
+  <nav class="nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+    <a routerLink="/projects" routerLinkActive="active">Projects</a>
+    <a routerLink="/skills" routerLinkActive="active">Skills</a>
+    <a routerLink="/topics" routerLinkActive="active">Topics</a>
+    <a routerLink="/about" routerLinkActive="active">About</a>
+    <a routerLink="/contact" routerLinkActive="active">Contact</a>
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/admin" routerLinkActive="active">Admin</a>
+
+    <!-- was: <button class="btn" (click)="cv()">... -->
+    <a class="btn"
+       href="assets/cv/Youstina_Sameh_Fahim_CV.pdf"
+       download="Youstina_Sameh_Fahim_CV.pdf">
+      📄 Download CV
+    </a>
+  </nav>
+</header>

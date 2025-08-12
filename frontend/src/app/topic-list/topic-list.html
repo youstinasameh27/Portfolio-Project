@@ -1,0 +1,15 @@
+<div class="grid">
+  <div class="card item" *ngFor="let t of topics">
+    <div class="row">
+      <div class="col">
+        <h3 class="m-0">{{t.name}}</h3>
+        <small class="text-muted">{{t.section}} • grade {{t.grade}}</small>
+      </div>
+      <div class="col-auto">
+        <a class="btn" [routerLink]="['/topics', t._id || t.id, 'edit']">Edit</a>
+        <button type="button" class="btn" (click)="delete(t, $event)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+

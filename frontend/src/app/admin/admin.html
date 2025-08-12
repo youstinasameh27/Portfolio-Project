@@ -1,0 +1,97 @@
+<div class="container admin-wrap">
+  <!-- Header -->
+  <header class="admin-hero card">
+    <div class="hero-left">
+      <div class="bubble brand"></div>
+      <div>
+        <h1 class="title">Admin</h1>
+        <p class="muted">Quick actions to manage your portfolio content.</p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn" routerLink="/projects/new">+ Add Project</a>
+      <a class="btn" routerLink="/skills/new">+ Add Skill</a>
+      <a class="btn" routerLink="/topics/new">+ Add Topic</a>
+    </div>
+  </header>
+
+  <!-- Quick Sections -->
+  <section class="grid-areas">
+    <!-- Projects -->
+    <div class="area card">
+      <div class="area-head">
+        <div class="bubble pink"></div>
+        <div>
+          <h2>Projects</h2>
+          <p class="muted">Create, edit and organize portfolio projects.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn" routerLink="/projects/new">+ Add Project</a>
+        <a class="btn btn-plain" routerLink="/projects">Manage Projects</a>
+      </div>
+
+      <ul class="tips">
+        <li>Use clear titles and a short problem/solution description.</li>
+        <li>Add a cover image (PNG/JPG) to make cards pop.</li>
+      </ul>
+    </div>
+
+    <!-- Skills -->
+    <div class="area card">
+      <div class="area-head">
+        <div class="bubble violet"></div>
+        <div>
+          <h2>Skills</h2>
+          <p class="muted">Logos and proficiency levels for your stack.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn" routerLink="/skills/new">+ Add Skill</a>
+        <a class="btn btn-plain" routerLink="/skills">Manage Skills</a>
+      </div>
+
+      <ul class="tips">
+        <li>Keep names consistent (e.g., “Angular”, not “Angular 20”).</li>
+        <li>Levels: beginner / intermediate / advanced / expert.</li>
+      </ul>
+    </div>
+
+    <!-- Topics & Grades -->
+    <div class="area card">
+      <div class="area-head">
+        <div class="bubble purple"></div>
+        <div>
+          <h2>Topics & Grades</h2>
+          <p class="muted">Track the course sections & your grades.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn" routerLink="/topics/new">+ Add Topic</a>
+        <a class="btn btn-plain" routerLink="/topics">Manage Topics</a>
+      </div>
+
+      <ul class="tips">
+        <li>Sections: Introduction / Backend / Frontend.</li>
+        <li>Show these on Home and Dashboard automatically.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Shortcuts row -->
+  <section class="shortcuts card">
+    <h3>Shortcuts</h3>
+    <div class="row">
+      <a class="chip" routerLink="/dashboard">📊 Dashboard</a>
+      <a class="chip" routerLink="/projects">🗂️ All Projects</a>
+      <a class="chip" routerLink="/skills">💡 All Skills</a>
+      <a class="chip" routerLink="/topics">📚 All Topics</a>
+      <a class="chip" routerLink="/contact">✉️ Contact</a>
+      <a class="chip" routerLink="/">🏠 Home</a>
+    </div>
+  </section>
+</div>

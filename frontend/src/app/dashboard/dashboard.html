@@ -1,0 +1,103 @@
+<!-- Top counters -->
+<div class="stats grid">
+  <div class="stat card">
+    <div class="n">{{ totals.projects }}</div>
+    <div class="t">Projects</div>
+  </div>
+  <div class="stat card">
+    <div class="n">{{ totals.skills }}</div>
+    <div class="t">Skills</div>
+  </div>
+  <div class="stat card">
+    <div class="n">{{ totals.topics }}</div>
+    <div class="t">Topics</div>
+  </div>
+  <div class="stat card">
+    <div class="n">{{ totals.messages }}</div>
+    <div class="t">Messages</div>
+  </div>
+  <div class="stat card">
+    <div class="n">{{ totals.cvDownloads }}</div>
+    <div class="t">CV Downloads</div>
+  </div>
+</div>
+
+<!-- Skills (slider style with labelled scale) -->
+<section class="card" style="margin-top:16px;">
+  <h3>Skills</h3>
+
+  <div *ngIf="!recentSkills?.length" class="text-muted">No skills yet.</div>
+
+  <div class="skill-slider-row" *ngFor="let s of recentSkills">
+    <div class="skill-name">{{ s.name }}</div>
+
+    <div class="level-wrap">
+      <div class="level-track">
+        <div class="level-fill" [style.width.%]="levelPercent(s.level)"></div>
+        <div class="level-thumb" [style.left.%]="levelPercent(s.level)"></div>
+
+        <!-- tick marks -->
+        <div class="tick t0"></div>
+        <div class="tick t1"></div>
+        <div class="tick t2"></div>
+        <div class="tick t3"></div>
+      </div>
+
+      <!-- scale labels -->
+      <div class="tick-labels">
+        <span>Beginner</span>
+        <span>Specialist</span>
+        <span>Proficient</span>
+        <span>Expert</span>
+      </div>
+    </div>
+
+    <div class="level-label">{{ prettyLevel(s.level) }}</div>
+  </div>
+</section>
+
+<!-- Recent items -->
+<div class="grid" style="margin-top:16px;">
+  <section class="card">
+    <h3>Recent Projects</h3>
+    <ul class="list-unstyled m-0">
+      <li *ngFor="let p of recentProjects">{{ p.title }}</li>
+      <li *ngIf="!recentProjects?.length" class="text-muted">—</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h3>Recent Skills</h3>
+    <ul class="list-unstyled m-0">
+      <li *ngFor="let s of recentSkills">
+        {{ s.name }}
+        <small class="text-muted">— {{ prettyLevel(s.level) }}</small>
+      </li>
+      <li *ngIf="!recentSkills?.length" class="text-muted">—</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h3>Recent Topics</h3>
+    <ul class="list-unstyled m-0">
+      <li *ngFor="let t of recentTopics">
+        {{ t.name }}
+        <small class="text-muted">— {{ t.section }} • grade {{ t.grade }}</small>
+      </li>
+      <li *ngIf="!recentTopics?.length" class="text-muted">—</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h3>Recent Messages</h3>
+    <ul class="list-unstyled m-0">
+      <li *ngFor="let m of messages">
+        <b>{{ m.name }}</b> <small class="text-muted">({{ m.email }})</small>:
+        <span>{{ m.message }}</span>
+        <button class="btn btn-sm" style="margin-left:8px" (click)="markRead(m._id || m.id)">Mark read</button>
+        <button class="btn btn-sm" style="margin-left:4px" (click)="deleteMessage(m._id || m.id)">Delete</button>
+      </li>
+      <li *ngIf="!messages?.length" class="text-muted">—</li>
+    </ul>
+  </section>
+</div>

@@ -1,0 +1,13 @@
+:host::before{
+  content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 400px at 90% 10%, rgba(230,91,255,.18), transparent 60%),
+    url("/assets/background/skills.jpg") center/cover no-repeat,
+    var(--bg);
+  opacity:.18;
+}
+
+.grid-cards{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card.skill{ padding:14px; display:flex; gap:12px; align-items:center; }
+.card.skill img{ width:42px; height:42px; border-radius:10px; object-fit:cover; background:#222; }
+.card.skill .right{ margin-left:auto; display:flex; gap:8px; }

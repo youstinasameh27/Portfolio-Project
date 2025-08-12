@@ -1,0 +1,29 @@
+<h2>{{isEdit?'Edit':'Add'}} Project</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="card form" novalidate>
+  <label>Title</label>
+  <input type="text" formControlName="title">
+  <div *ngIf="form.controls['title'].invalid && (form.controls['title'].dirty || form.controls['title'].touched)" class="text-danger">Title is required (min 3).</div>
+
+  <label>Description</label>
+  <textarea formControlName="description"></textarea>
+  <div *ngIf="form.controls['description'].invalid && (form.controls['description'].dirty || form.controls['description'].touched)" class="text-danger">Description is required (min 10).</div>
+
+  <label>Tech (comma separated)</label>
+  <input type="text" formControlName="tech">
+  <div *ngIf="form.controls['tech'].invalid && (form.controls['tech'].dirty || form.controls['tech'].touched)" class="text-danger">Enter at least one tech.</div>
+
+  <label>Link</label>
+  <input type="url" formControlName="link">
+
+  <label>Grade</label>
+  <input type="number" formControlName="grade">
+
+  <label>Image</label>
+  <input type="file" (change)="onFile($event)" #fileInput>
+  <div class="preview" *ngIf="previewUrl"><img [src]="previewUrl"></div>
+
+  <div class="row">
+    <button class="btn" type="submit">{{isEdit?'Update':'Create'}}</button>
+    <button class="btn" type="button" (click)="cancel()" style="background:#eee;color:#222">Cancel</button>
+  </div>
+</form>

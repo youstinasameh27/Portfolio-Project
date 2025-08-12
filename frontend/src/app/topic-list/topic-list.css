@@ -1,0 +1,11 @@
+:host::before{
+  content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 400px at 50% 0%, rgba(168,85,247,.18), transparent 60%),
+    url("/assets/background/topics.jpg") center/cover no-repeat,
+    var(--bg);
+  opacity:.18;
+}
+
+.grid-cards{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card.item .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }

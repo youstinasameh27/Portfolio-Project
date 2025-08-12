@@ -1,0 +1,22 @@
+<h2>{{isEdit?'Edit':'Add'}} Skill</h2>
+<form (ngSubmit)="submit()" [formGroup]="form" class="card form" novalidate>
+  <label>Name</label>
+  <input type="text" formControlName="name">
+  <div *ngIf="form.controls['name'].invalid && (form.controls['name'].dirty || form.controls['name'].touched)" class="text-danger">Name is required (min 2).</div>
+
+  <label>Level</label>
+  <select formControlName="level">
+    <option value="beginner">Beginner</option>
+    <option value="intermediate">Intermediate</option>
+    <option value="advanced">Advanced</option>
+  </select>
+
+  <label>Icon</label>
+  <input type="file" (change)="onFile($event)" #fileInput>
+  <div class="preview" *ngIf="previewUrl"><img [src]="previewUrl"></div>
+
+  <div class="row">
+    <button class="btn" type="submit">{{isEdit?'Update':'Create'}}</button>
+    <button class="btn" type="button" (click)="cancel()" style="background:#eee;color:#222">Cancel</button>
+  </div>
+</form>

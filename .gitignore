@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.angular/
+.vite/
+.parcel-cache/
+coverage/
+.vscode/
+.DS_Store
+Thumbs.db
+.env
+.env.*.local

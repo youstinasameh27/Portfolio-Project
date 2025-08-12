@@ -1,0 +1,10 @@
+<div *ngIf="p" class="card" style="padding:16px">
+  <img [src]="'http://localhost:4000' + (p.imageUrl || '/uploads/missing.jpg')" alt="project" class="hero">
+  <h1>{{p.title}}</h1>
+  <p>{{p.description}}</p>
+  <p><b>Tech:</b> <span class="tag" *ngFor="let t of p.tech">{{t}}</span></p>
+  <div class="row">
+    <a *ngIf="p.link" [href]="p.link" target="_blank" class="btn">Visit</a>
+    <a [routerLink]="['/projects', p._id, 'edit']" class="btn">Edit</a>
+  </div>
+</div>

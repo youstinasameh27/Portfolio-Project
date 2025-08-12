@@ -1,0 +1,99 @@
+<section class="hero">
+  <!-- Banner -->
+  <div class="hero-banner card">
+    <img src="assets/background/hero-bg.jpg" alt="cover">
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- Profile block (always above banner) -->
+  <div class="hero-content">
+    <img src="assets/profile/me.jpg" alt="profile" class="avatar xl">
+    <div class="info">
+      <h1 class="name">Youstina Sameh Fahim</h1>
+      <p class="tagline">
+        AI & Machine Learning Intern • MEAN Stack (Angular • Node • Express • MongoDB)
+      </p>
+      <div class="cta">
+        <button class="btn" (click)="downloadCV()">📄 Download CV</button>
+        <a routerLink="/projects" class="btn">See Projects</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Education</h2>
+  <div class="edu">
+    <div class="card item" *ngFor="let e of education">
+      <h3>{{ e.degree }}</h3>
+      <p><b>{{ e.school }}</b> • {{ e.years }}</p>
+      <p *ngIf="e.note">{{ e.note }}</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Recent Projects</h2>
+  <div *ngIf="!projects?.length" class="text-muted" style="margin:8px 0 16px;">
+    No projects yet — add one from Projects ➜ New.
+  </div>
+
+  <div class="grid projects">
+    <a
+      class="card proj"
+      *ngFor="let p of projects; let i = index"
+      [routerLink]="['/projects', p._id || p.id]"
+      (mouseenter)="enter(i)"
+      (mouseleave)="leave()"
+      [class.hovered]="i === cardHoverIndex"
+    >
+      <div class="thumb">
+        <img
+          [src]="'http://localhost:4000' + (p.imageUrl || '/uploads/missing.jpg')"
+          alt="project cover"
+          loading="lazy"
+        >
+      </div>
+      <div class="meta">
+        <h3 class="title">{{ p.title }}</h3>
+        <p class="muted line-clamp-2">{{ p.description }}</p>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>Skills</h2>
+  <div *ngIf="!skills?.length" class="text-muted" style="margin:8px 0 16px;">
+    No skills yet — add one from Skills ➜ New.
+  </div>
+
+  <div class="grid skills">
+    <div class="card skill" *ngFor="let s of skills">
+      <img [src]="'http://localhost:4000' + (s.iconUrl || '/uploads/missing.jpg')" alt="icon">
+      <div class="meta">
+        <h3>{{ s.name }}</h3>
+        <span class="badge">{{ s.level }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Topics</h2>
+  <div *ngIf="!topics?.length" class="text-muted" style="margin:8px 0 16px;">
+    No topics yet — add one from Topics ➜ New.
+  </div>
+  <div class="grid topics">
+    <div class="card item" *ngFor="let t of topics">
+      <h3>{{ t.name }}</h3>
+      <p><b>{{ t.section }}</b> • Grade: {{ t.grade }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="contact-preview card">
+  <h2>Contact</h2>
+  <p>Email: yousstinasameh2017@gmail.com • Phone: 01224464636</p>
+  <a routerLink="/contact" class="btn">Go to Contact</a>
+</section>

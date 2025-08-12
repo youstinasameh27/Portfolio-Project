@@ -1,0 +1,11 @@
+:host::before{
+  content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 400px at 20% 0%, rgba(230,91,255,.18), transparent 60%),
+    url("/assets/background/contact.jpg") center/cover no-repeat,
+    var(--bg);
+  opacity:.18;
+}
+
+form{ max-width: 640px; margin: 12px auto; }
+button[type="submit"]{ width:100%; }

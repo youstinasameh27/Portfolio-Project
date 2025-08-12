@@ -1,0 +1,10 @@
+:host::before{
+  content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 400px at 0% 100%, rgba(137,87,255,.18), transparent 60%),
+    url("/assets/background/admin.jpg") center/cover no-repeat,
+    var(--bg);
+  opacity:.16;
+}
+
+.grid-cards{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
