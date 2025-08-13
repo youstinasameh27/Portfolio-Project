@@ -1,89 +1,97 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ProjectService } from '../core/services/project.service';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-project-form',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './project-form.html',
   styleUrl: './project-form.css'
 })
-export class ProjectForm implements OnInit{
+export class ProjectForm implements OnInit {
   form!: FormGroup;
-  isEdit = false; id: string | null = null;
+  isEdit = false;
+  id: string | null = null;
 
   file: File | null = null;
-  previewUrl: string | null = null;   // <-- used by the template
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  previewUrl: string | undefined;
 
   constructor(
-    private fb:FormBuilder,
-    private route:ActivatedRoute,
-    private router:Router,
-    private svc:ProjectService
-  ){}
+    private router: Router,
+    private svc: ProjectService
+  ) {
+   
+    this.form = new FormGroup({
+      title: new FormControl('', [Validators.required, Validators.minLength(3)]),
+      description: new FormControl('', [Validators.required, Validators.minLength(10)]),
+      tech: new FormControl('', [Validators.required, Validators.minLength(2)]),
+      link: new FormControl(''),
+      grade: new FormControl(null)
+    });
+  }
 
-  ngOnInit(){
-    this.id = this.route.snapshot.paramMap.get('id');
+
+  private getIdFromUrl(): string | null {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+  
+    const editIdx = parts.indexOf('edit');
+    if (editIdx > 0) return parts[editIdx - 1] || null;
+    const i = parts.indexOf('projects');
+    return i >= 0 && parts[i + 1] && parts[i + 1] !== 'new' ? parts[i + 1] : null;
+  }
+
+  ngOnInit() {
+    this.id = this.getIdFromUrl();
     this.isEdit = !!this.id;
 
-    this.form = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      tech: [''],
-      link: [''],
-      grade: [null]
-    });
-
-    if (this.isEdit && this.id){
-      this.svc.get(this.id).subscribe(r => {
-        const p:any = r.data;
-        if (p){
-          this.form.patchValue({
-            title: p.title || '',
-            description: p.description || '',
-            tech: (p.tech || []).join(', '),
-            link: p.link || '',
-            grade: p.grade ?? null
-          });
-          // if editing, show existing image if any
-          this.previewUrl = p.imageUrl ? ('http://localhost:4000' + p.imageUrl) : null;
-        }
+    if (this.isEdit) {
+      this.svc.get(this.id!).subscribe((res: any) => {
+        const p = res?.data || res;
+        this.form.patchValue({
+          title: p?.title || '',
+          description: p?.description || '',
+          tech: Array.isArray(p?.tech) ? p.tech.join(', ') : (p?.tech || ''),
+          link: p?.link || '',
+          grade: p?.grade ?? null
+        });
+        this.previewUrl = p?.imageUrl ? ('http://localhost:4000' + p.imageUrl) : undefined;
       });
     }
   }
 
-  /** Template calls this */
-  onFile(evt:any){
-    this.pickFile(evt); // keep both names to match any template
-  }
-
-  /** Internal helper (and backward compatible) */
-  pickFile(evt:any){
-    this.file = evt?.target?.files?.[0] ?? null;
-    if (this.file){
-      const reader = new FileReader();
-      reader.onload = () => this.previewUrl = reader.result as string;
-      reader.readAsDataURL(this.file);
-    } else {
-      this.previewUrl = null;
+ 
+  onFile(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.file = input.files[0];
+      const r = new FileReader();
+      r.onload = () => (this.previewUrl = r.result as string);
+      r.readAsDataURL(this.file);
     }
   }
 
-  /** Template calls this */
-  cancel(){
-    this.router.navigate(['/projects']);
+ 
+  clearFile() {
+    this.file = null;
+    this.previewUrl = undefined;
   }
 
-  submit(){
-    if (this.form.invalid){
+  
+  cancel() {
+    this.form.reset();
+    this.clearFile();
+  }
+
+  
+  submit() {
+    if (this.form.invalid) {
       Object.values(this.form.controls).forEach(c => c.markAsTouched());
       return;
     }
+
     const v = this.form.value;
     const fd = new FormData();
     fd.append('title', v.title || '');
@@ -93,12 +101,13 @@ export class ProjectForm implements OnInit{
     if (v.grade !== null && v.grade !== undefined) fd.append('grade', String(v.grade));
     if (this.file) fd.append('image', this.file);
 
-    if (this.isEdit){
+    if (this.isEdit) {
       fd.append('keepImage', this.file ? 'false' : 'true');
       this.svc.update(this.id!, fd);
     } else {
       this.svc.create(fd);
     }
+
     this.router.navigate(['/projects']);
   }
 }

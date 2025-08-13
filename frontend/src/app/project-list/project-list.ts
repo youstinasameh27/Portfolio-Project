@@ -1,37 +1,69 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { NgFor } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ProjectService } from '../core/services/project.service';
 
 @Component({
   selector: 'app-project-list',
-  standalone: true,
-  imports: [NgFor, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './project-list.html',
   styleUrl: './project-list.css'
 })
 export class ProjectList implements OnInit {
-  private svc = inject(ProjectService);
-
-  list$ = this.svc.list$;
-  projects: any[] = [];
   q = '';
+  projects: any[] = [];
 
-  ngOnInit(){
-    this.svc.list$.subscribe(list => this.projects = list);
-    this.svc.refresh();
+  constructor(private svc: ProjectService) {}
+
+  ngOnInit() {
+    
+    (this.svc as any).list$?.subscribe((list: any[]) => {
+      this.projects = Array.isArray(list) ? list : [];
+    });
+
+    
+    this.ensureLoaded();
   }
 
-  search(){ this.svc.search(this.q || ''); }
+  
+  search() {
+    const term = (this.q || '').trim();
+    this.svc.search(term);
+  }
 
-  // Works with _id or id coming from API/template
-  getId(item:any){ return item?._id || item?.id; }
 
-  delete(item:any, $event?: Event){
-    if ($event){ $event.preventDefault(); $event.stopPropagation(); }
-    const id = this.getId(item);
+  delete(id: string) { this.del(id); }
+
+
+  del(id: string) {
     if (!id) return;
-    if (confirm('Delete this project?')) this.svc.delete(id);
+    if (!confirm('Delete this project?')) return;
+
+    const req: any = this.svc.delete(id);
+
+    
+    if (req?.subscribe) {
+      req.subscribe({ next: () => this.ensureLoaded() });
+    } else if (req?.then) {
+      req.then(() => this.ensureLoaded());
+    } else if (req?.unsubscribe) {
+      this.ensureLoaded();
+    } else {
+      this.ensureLoaded();
+    }
+  }
+
+
+  private ensureLoaded() {
+    const s: any = this.svc;
+   
+    if (typeof s.search === 'function') {
+      try { s.search(''); return; } catch {}
+    }
+    
+    if (typeof s.refresh === 'function') {
+      try { s.refresh(); return; } catch {}
+    }
   }
 }

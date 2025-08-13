@@ -1,6 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MessageService } from '../core/services/message.service';
 import { ProjectService } from '../core/services/project.service';
 import { SkillService } from '../core/services/skill.service';
@@ -9,75 +8,92 @@ import { TopicService } from '../core/services/topic.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [CommonModule], 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard implements OnInit{
-  private http  = inject(HttpClient);
-  private msg   = inject(MessageService);
-  private proj  = inject(ProjectService);
-  private skill = inject(SkillService);
-  private topic = inject(TopicService);
-
+export class Dashboard implements OnInit {
   totals = { projects: 0, skills: 0, topics: 0, messages: 0, cvDownloads: 0 };
+  projByYear: Array<{ _id: number; count: number }> = [];
+  skillByLevel: Array<{ _id: string; count: number }> = [];
+  maxYearCount = 1;
 
-  recentProjects:any[] = [];
-  recentSkills:any[]   = [];
-  recentTopics:any[]   = [];
-  messages:any[]       = [];
+  messages: any[] = [];
+  recentProjects: any[] = [];
+  recentSkills: any[] = [];
+  recentTopics: any[] = [];
 
-  ngOnInit(){
-    this.proj.list$.subscribe(l => {
-      this.totals.projects = l.length;
-      this.recentProjects = l.slice(0, 6);
+  constructor(
+    private msgSvc: MessageService,
+    private projSvc: ProjectService,
+    private skillSvc: SkillService,
+    private topicSvc: TopicService
+  ) {}
+
+  ngOnInit(): void {
+    this.ensureLoaded();
+
+    (this.projSvc as any).list$?.subscribe((list: any[]) => {
+      const arr = Array.isArray(list) ? list : [];
+      this.totals.projects = arr.length;
+      const perYear = new Map<number, number>();
+      for (const p of arr) {
+        const d = p?.createdAt ? new Date(p.createdAt) : null;
+        const y = d && !isNaN(d.getTime()) ? d.getFullYear() : new Date().getFullYear();
+        perYear.set(y, (perYear.get(y) || 0) + 1);
+      }
+      this.projByYear = Array.from(perYear.entries()).sort((a,b)=>a[0]-b[0]).map(([y,c])=>({_id:y,count:c}));
+      this.maxYearCount = Math.max(1, ...this.projByYear.map(x=>x.count));
+      this.recentProjects = this.pickRecent(arr);
     });
 
-    this.skill.list$.subscribe(l => {
-      this.totals.skills = l.length;
-      this.recentSkills  = l.slice(0, 12); // show more so the sliders look nice
+    (this.skillSvc as any).list$?.subscribe((list: any[]) => {
+      const arr = Array.isArray(list) ? list : [];
+      this.totals.skills = arr.length;
+      const levels = new Map<string, number>();
+      for (const s of arr) {
+        const lvl = (s?.level || 'beginner').toString();
+        levels.set(lvl, (levels.get(lvl) || 0) + 1);
+      }
+      this.skillByLevel = Array.from(levels.entries()).map(([k,v])=>({_id:k,count:v}));
+      this.recentSkills = this.pickRecent(arr);
     });
 
-    this.topic.list$.subscribe(l => {
-      this.totals.topics = l.length;
-      this.recentTopics  = l.slice(0, 8);
+    (this.topicSvc as any).list$?.subscribe((list: any[]) => {
+      const arr = Array.isArray(list) ? list : [];
+      this.totals.topics = arr.length;
+      this.recentTopics = this.pickRecent(arr);
     });
 
-    this.msg.list$.subscribe(l => {
-      this.messages = l;
-      this.totals.messages = l.length;
-    });
-
-    // fetch fresh data
-    this.proj.refresh();
-    this.skill.refresh();
-    this.topic.refresh();
-    this.msg.refresh();
-
-    // only need CV downloads from stats now
-    this.http.get<any>('http://localhost:4000/stats').subscribe(s => {
-      if (s?.totals?.cvDownloads != null) this.totals.cvDownloads = s.totals.cvDownloads;
+    (this.msgSvc as any).list$?.subscribe((list: any[]) => {
+      this.messages = Array.isArray(list) ? list : [];
+      this.totals.messages = this.messages.length;
     });
   }
 
-  /** Position of the knob on the track (0–100). Accepts common names. */
-  levelPercent(level:string){
-    const l = (level || '').toLowerCase().trim();
-    if (l === 'expert') return 100;
-    if (l === 'advanced') return 85;
-    if (l === 'proficient') return 75;
-    if (l === 'intermediate' || l === 'specialist') return 55;
-    if (l === 'beginner') return 25;
-    // default mid if unknown
-    return 50;
+  barHeight(c:number){ return (c / (this.maxYearCount || 1)) * 100; }
+  markRead(id:string){ this.msgSvc.markRead(id); }
+  del(id:string){
+    if (!id) return;
+    if (confirm('Delete this message?')) {
+      const req:any = (this.msgSvc as any).delete?.(id);
+      if (req?.subscribe) req.subscribe({ next:()=>{}, error:()=>{} });
+      else if (req?.then) req.then(()=>{}).catch(()=>{});
+    }
   }
 
-  /** Pretty label for the level on the right side */
-  prettyLevel(level:string){
-    if (!level) return '—';
-    return level.charAt(0).toUpperCase() + level.slice(1);
+  private ensureLoaded(){
+    for (const svc of [this.projSvc, this.skillSvc, this.topicSvc, this.msgSvc]){
+      const s:any = svc;
+      if (typeof s.refresh === 'function'){ try{s.refresh(); continue;}catch{} }
+      if (typeof s.search  === 'function'){ try{s.search(''); continue;}catch{} }
+      if (typeof s.list    === 'function'){ try{s.list();    continue;}catch{} }
+      if (typeof s.load    === 'function'){ try{s.load();    continue;}catch{} }
+    }
   }
-
-  markRead(id:string){ this.msg.markRead(id); }
-  deleteMessage(id:string){ this.msg.delete(id); }
+  private pickRecent(arr:any[]){ return [...arr].sort((a,b)=>{
+    const ad=a?.createdAt?new Date(a.createdAt).getTime():0;
+    const bd=b?.createdAt?new Date(b.createdAt).getTime():0;
+    return bd-ad;
+  }).slice(0,5); }
 }

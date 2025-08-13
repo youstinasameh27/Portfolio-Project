@@ -1,90 +1,103 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SkillService } from '../core/services/skill.service';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-skill-form',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './skill-form.html',
   styleUrl: './skill-form.css'
 })
-export class SkillForm implements OnInit{
+export class SkillForm implements OnInit {
   form!: FormGroup;
-  isEdit = false; id: string | null = null;
+  isEdit = false;
+  id: string | null = null;
 
+  
   file: File | null = null;
-  previewUrl: string | null = null;  // <-- used by the template
+  previewUrl: string | undefined;
 
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  constructor(private router: Router, private svc: SkillService) {
+ 
+    this.form = new FormGroup({
+      name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+      level: new FormControl('beginner', Validators.required)
+    });
+  }
 
-  constructor(
-    private fb:FormBuilder,
-    private route:ActivatedRoute,
-    private router:Router,
-    private svc:SkillService
-  ){}
 
-  ngOnInit(){
-    this.id = this.route.snapshot.paramMap.get('id');
+  private getIdFromUrl(): string | null {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const editIdx = parts.indexOf('edit');
+    if (editIdx > 0) return parts[editIdx - 1] || null;
+    const i = parts.indexOf('skills');
+    const candidate = i >= 0 ? parts[i + 1] : null;
+    const hex24 = parts.find(p => /^[a-f0-9]{24}$/i.test(p));
+    return candidate && candidate !== 'new' ? candidate : (hex24 || null);
+  }
+
+  ngOnInit() {
+    this.id = this.getIdFromUrl();
     this.isEdit = !!this.id;
 
-    this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      level: ['beginner', Validators.required]
-    });
-
-    if (this.isEdit && this.id){
-      this.svc.list$.subscribe(list => {
-        const s:any = list.find((x:any) => x._id === this.id);
-        if (s){
-          this.form.patchValue({ name: s.name || '', level: s.level || 'beginner' });
-          this.previewUrl = s.iconUrl ? ('http://localhost:4000' + s.iconUrl) : null;
-        }
+    if (this.isEdit && typeof (this.svc as any).get === 'function') {
+      (this.svc as any).get(this.id!).subscribe((res: any) => {
+        const s = res?.data ?? res;
+        this.form.patchValue({
+          name: s?.name || '',
+          level: s?.level || 'beginner'
+        });
+        if (s?.iconUrl) this.previewUrl = 'http://localhost:4000' + s.iconUrl;
       });
     }
   }
 
-  /** Template calls this */
-  onFile(evt:any){
-    this.pickFile(evt); // alias
-  }
 
-  /** Internal helper (and backward compatible) */
-  pickFile(evt:any){
-    this.file = evt?.target?.files?.[0] ?? null;
-    if (this.file){
-      const reader = new FileReader();
-      reader.onload = () => this.previewUrl = reader.result as string;
-      reader.readAsDataURL(this.file);
-    } else {
-      this.previewUrl = null;
+  onFile(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (input?.files && input.files.length) {
+      this.file = input.files[0];
+      const r = new FileReader();
+      r.onload = () => (this.previewUrl = r.result as string);
+      r.readAsDataURL(this.file);
     }
   }
+  clearFile() { this.file = null; this.previewUrl = undefined; }
+  cancel() { this.form.reset(); this.clearFile(); }
 
-  /** Template calls this */
-  cancel(){
-    this.router.navigate(['/skills']);
-  }
 
-  submit(){
-    if (this.form.invalid){
+  submit() { this._doSubmit(); }
+  save() { this._doSubmit(); }
+  onSubmit() { this._doSubmit(); }
+  update() { this._doSubmit(); }
+
+  private _doSubmit() {
+    if (this.form.invalid) {
       Object.values(this.form.controls).forEach(c => c.markAsTouched());
       return;
     }
+
+  
     const v = this.form.value;
     const fd = new FormData();
     fd.append('name', v.name || '');
-    fd.append('level', v.level || 'beginner');
+    fd.append('level', (v.level || 'beginner').toString());
     if (this.file) fd.append('icon', this.file);
 
-    if (this.isEdit){
-      this.svc.update(this.id!, fd);
+    let req: any;
+    if (this.isEdit) {
+      if (!this.file) fd.append('keepIcon', 'true');
+      req = (this.svc as any).update(this.id!, fd);
     } else {
-      this.svc.create(fd);
+      req = (this.svc as any).create(fd);
     }
-    this.router.navigate(['/skills']);
+
+    
+    if (req?.subscribe) req.subscribe({ next: () => this.router.navigate(['/skills']), error: () => this.router.navigate(['/skills']) });
+    else if (req?.then) req.then(() => this.router.navigate(['/skills'])).catch(() => this.router.navigate(['/skills']));
+    else this.router.navigate(['/skills']);
   }
 }

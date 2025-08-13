@@ -1,17 +1,46 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
-import { ITopic } from '../model';
 
 @Injectable({ providedIn: 'root' })
-export class TopicService{
-  api = 'http://localhost:4000/api/topics';
-  private _list$ = new BehaviorSubject<ITopic[]>([]);
+export class TopicService {
+  private api = 'http://localhost:4000/api/topics';
+
+  private _list$ = new BehaviorSubject<any[]>([]);
   list$ = this._list$.asObservable();
 
-  constructor(private http: HttpClient){ this.refresh(); }
-  refresh(){ this.http.get<{success:boolean; data:ITopic[]}>(this.api).subscribe(r => this._list$.next(r.data)); }
-  create(body: Partial<ITopic>){ return this.http.post(this.api, body).subscribe(()=> this.refresh()); }
-  update(id: string, body: Partial<ITopic>){ return this.http.put(`${this.api}/${id}`, body).subscribe(()=> this.refresh()); }
-  delete(id: string){ return this.http.delete(`${this.api}/${id}`).subscribe(()=> this.refresh()); }
+  constructor(private http: HttpClient) {
+    this.refresh();
+  }
+
+  refresh() {
+    this.http.get<{ success: boolean; data: any[] }>(this.api)
+      .subscribe(res => this._list$.next(res?.data ?? []));
+  }
+
+  search(q: string) {
+    const url = q ? `${this.api}?q=${encodeURIComponent(q)}` : this.api;
+    this.http.get<{ success: boolean; data: any[] }>(url)
+      .subscribe(res => this._list$.next(res?.data ?? []));
+  }
+
+  get(id: string) {
+    return this.http.get<{ success: boolean; data: any }>(`${this.api}/${id}`);
+  }
+
+  create(payload: any) {
+
+    return this.http.post(this.api, payload)
+      .subscribe(() => this.refresh());
+  }
+
+  update(id: string, payload: any) {
+    return this.http.put(`${this.api}/${id}`, payload)
+      .subscribe(() => this.refresh());
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${this.api}/${id}`)
+      .subscribe(() => this.refresh());
+  }
 }

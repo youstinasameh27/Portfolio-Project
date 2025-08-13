@@ -1,33 +1,25 @@
-<div class="page container">
-  <div class="header-row">
-    <h2 class="m-0">Projects</h2>
-    <a class="btn" routerLink="/projects/new">+ Add Project</a>
-  </div>
+<div class="head">
+  <h2>Projects</h2>
+  <a routerLink="/projects/new" class="btn">+ Add Project</a>
+</div>
 
-  <div class="search-row">
-    <input [(ngModel)]="q" (keyup.enter)="search()" placeholder="Search projects">
-    <button class="btn" type="button" (click)="search()">Search</button>
-  </div>
+<div class="search">
+  <input [(ngModel)]="q" placeholder="Search projects">
+  <button class="btn" (click)="search()">Search</button>
+</div>
 
-  <div class="grid-cards">
-    <div class="card project" *ngFor="let p of projects">
-      <div class="thumb">
-        <img
-          [src]="'http://localhost:4000' + (p.imageUrl || '/uploads/missing.jpg')"
-          alt="project cover"
-          loading="lazy"
-        >
-      </div>
-
-      <div class="inner">
-        <h3 class="title">{{ p.title }}</h3>
-        <p class="muted">{{ p.description }}</p>
-
-        <div class="actions">
-          <a class="btn btn-sm" [routerLink]="['/projects', p._id || p.id]">Details</a>
-          <a class="btn btn-sm" [routerLink]="['/projects', p._id || p.id, 'edit']">Edit</a>
-          <button class="btn btn-sm" type="button" (click)="delete(p, $event)">Delete</button>
-        </div>
+<div class="grid">
+  <div class="card proj" *ngFor="let p of projects">
+    <a [routerLink]="['/projects', p._id]">
+      <img [src]="'http://localhost:4000' + (p.imageUrl || '/uploads/missing.jpg')" alt="project">
+    </a>
+    <div class="meta">
+      <h3>{{p.title}}</h3>
+      <p>{{p.description}}</p>
+      <div class="row">
+        <a [routerLink]="['/projects', p._id]" class="btn">Details</a>
+        <a [routerLink]="['/projects', p._id, 'edit']" class="btn">Edit</a>
+        <button (click)="del(p._id)" class="btn" style="background:#ff6b6b">Delete</button>
       </div>
     </div>
   </div>
